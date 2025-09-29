@@ -37,6 +37,9 @@ dotnet run --project src/KeyLockr.Cli -- lock --force
 # 解锁或查询状态
 dotnet run --project src/KeyLockr.Cli -- unlock
 dotnet run --project src/KeyLockr.Cli -- status
+
+# 调试：列出所有键盘设备及判定
+dotnet run --project src/KeyLockr.Cli -- debug
 ```
 
 4. 打包并运行托盘程序：
