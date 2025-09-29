@@ -1,0 +1,12 @@
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\bin\Release\net8.0-windows\KeyLockr.Core.deps.json
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\bin\Release\net8.0-windows\KeyLockr.Core.dll
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\bin\Release\net8.0-windows\KeyLockr.Core.pdb
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\KeyLockr.Core.GeneratedMSBuildEditorConfig.editorconfig
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\KeyLockr.Core.AssemblyInfoInputs.cache
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\KeyLockr.Core.AssemblyInfo.cs
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\KeyLockr.Core.csproj.CoreCompileInputs.cache
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\KeyLockr.Core.sourcelink.json
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\KeyLockr.Core.dll
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\refint\KeyLockr.Core.dll
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\KeyLockr.Core.pdb
+F:\dev\tools\KeyLockr\src\KeyLockr.Core\obj\Release\net8.0-windows\ref\KeyLockr.Core.dll

@@ -36,7 +36,8 @@ internal static class SetupApiNative
 
     public enum Dics : uint
     {
-        Disable = 0x00000000,
+        // According to SetupAPI, DICS_DISABLE = 0x00000002
+        Disable = 0x00000002,
         Enable = 0x00000001,
         PropChange = 0x00000003
     }

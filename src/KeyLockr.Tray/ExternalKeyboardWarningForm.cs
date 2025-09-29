@@ -5,7 +5,7 @@ namespace KeyLockr.Tray;
 
 public sealed class ExternalKeyboardWarningForm : Form
 {
-    private readonly Timer _timer;
+    private readonly System.Windows.Forms.Timer _timer;
     private readonly Label _countdownLabel;
     private int _remainingSeconds;
 
@@ -74,7 +74,7 @@ public sealed class ExternalKeyboardWarningForm : Form
         AcceptButton = cancelButton;
         CancelButton = cancelButton;
 
-        _timer = new Timer { Interval = 1000 };
+        _timer = new System.Windows.Forms.Timer { Interval = 1000 };
         _timer.Tick += (_, _) => UpdateCountdown();
         Shown += (_, _) => { UpdateCountdown(); _timer.Start(); };
         FormClosed += (_, _) => _timer.Stop();

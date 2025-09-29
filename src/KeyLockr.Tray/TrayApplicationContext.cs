@@ -45,6 +45,13 @@ public sealed class TrayApplicationContext : ApplicationContext
         _configuration = LoadConfiguration();
         _configPath = _configurationStore.ConfigurationPath;
 
+        // Initialize menu items first
+        _toggleMenuItem = new ToolStripMenuItem("切换锁定状态", null, async (_, _) => await ToggleAsync().ConfigureAwait(false));
+        _lockMenuItem = new ToolStripMenuItem("锁定内置键盘", null, async (_, _) => await LockInternalAsync().ConfigureAwait(false));
+        _unlockMenuItem = new ToolStripMenuItem("解锁内置键盘", null, async (_, _) => await UnlockInternalAsync().ConfigureAwait(false));
+        _statusMenuItem = new ToolStripMenuItem("查看状态", null, async (_, _) => await ShowStatusAsync().ConfigureAwait(false));
+        _openConfigMenuItem = new ToolStripMenuItem("打开配置文件", null, (_, _) => OpenConfiguration());
+
         _notifyIcon = CreateNotifyIcon();
         _hotkeyWindow = new HotkeyWindow(OnGlobalHotkey);
         RegisterHotkey();
@@ -91,11 +98,6 @@ public sealed class TrayApplicationContext : ApplicationContext
     {
         var menu = new ContextMenuStrip();
 
-        _toggleMenuItem = new ToolStripMenuItem("切换锁定状态", null, async (_, _) => await ToggleAsync().ConfigureAwait(false));
-        _lockMenuItem = new ToolStripMenuItem("锁定内置键盘", null, async (_, _) => await LockInternalAsync().ConfigureAwait(false));
-        _unlockMenuItem = new ToolStripMenuItem("解锁内置键盘", null, async (_, _) => await UnlockInternalAsync().ConfigureAwait(false));
-        _statusMenuItem = new ToolStripMenuItem("查看状态", null, async (_, _) => await ShowStatusAsync().ConfigureAwait(false));
-        _openConfigMenuItem = new ToolStripMenuItem("打开配置文件", null, (_, _) => OpenConfiguration());
         var exitMenuItem = new ToolStripMenuItem("退出", null, (_, _) => ExitApplication());
 
         menu.Items.AddRange(new ToolStripItem[]

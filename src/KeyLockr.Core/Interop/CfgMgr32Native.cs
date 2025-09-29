@@ -30,4 +30,10 @@ internal static class CfgMgr32Native
 
     [DllImport("CfgMgr32.dll", CharSet = CharSet.Unicode)]
     public static extern int CM_Get_DevNode_Status(out DevNodeStatus pulStatus, out CmProblem pulProblemNumber, uint dnDevInst, int ulFlags);
+
+    [DllImport("CfgMgr32.dll", CharSet = CharSet.Unicode)]
+    public static extern int CM_Disable_DevNode(uint dnDevInst, int ulFlags);
+
+    [DllImport("CfgMgr32.dll", CharSet = CharSet.Unicode)]
+    public static extern int CM_Enable_DevNode(uint dnDevInst, int ulFlags);
 }

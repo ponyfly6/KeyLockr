@@ -1,0 +1,9 @@
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\KeyLockr.Tray.exe
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\KeyLockr.Tray.dll
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\KeyLockr.Tray.deps.json
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\KeyLockr.Tray.runtimeconfig.json
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\KeyLockr.Tray.pdb
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\Microsoft.Windows.SDK.NET.dll
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\WinRT.Runtime.dll
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\KeyLockr.Core.dll
+F:\dev\tools\KeyLockr\src\KeyLockr.Tray\bin\Release\net8.0-windows10.0.19041.0\win-x64\publish\KeyLockr.Core.pdb

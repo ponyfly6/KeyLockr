@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "35W8NMzAEZo=",
+  "success": true,
+  "projectFilePath": "F:\\dev\\tools\\KeyLockr\\src\\KeyLockr.Cli\\KeyLockr.Cli.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Pony\\.nuget\\packages\\system.commandline\\2.0.0-beta4.22272.1\\system.commandline.2.0.0-beta4.22272.1.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -40,7 +40,19 @@ public sealed class KeyboardDeviceService : IKeyboardDeviceService
             var location = GetStringProperty(deviceInfoSet, ref deviceInfoData, SetupApiNative.Spdrp.LocationInformation);
             var status = GetStatus(deviceInfoData.DevInst);
 
-            var isRemovable = location != null && location.Contains("USB", StringComparison.OrdinalIgnoreCase);
+            // Check if this is a removable device (USB, Bluetooth, etc.)
+            var isRemovable = (location != null && (
+                location.Contains("USB", StringComparison.OrdinalIgnoreCase) ||
+                location.Contains("Bluetooth", StringComparison.OrdinalIgnoreCase) ||
+                location.Contains("BTHENUM", StringComparison.OrdinalIgnoreCase))) ||
+                // Check hardware IDs for Bluetooth indicators
+                hardwareIds.Any(id => 
+                    id.Contains("BTHENUM", StringComparison.OrdinalIgnoreCase) ||
+                    id.Contains("{00001812-", StringComparison.OrdinalIgnoreCase) || // Bluetooth HID
+                    id.Contains("VID_046D", StringComparison.OrdinalIgnoreCase)) || // Logitech (often external)
+                // Check instance ID for Bluetooth patterns
+                instanceId.Contains("BTHENUM", StringComparison.OrdinalIgnoreCase) ||
+                instanceId.Contains("{00001812-", StringComparison.OrdinalIgnoreCase);
 
             result.Add(new KeyboardDevice(instanceId, description, hardwareIds, location, status.IsEnabled, status.IsPresent, isRemovable));
             index++;
@@ -126,7 +138,23 @@ public sealed class KeyboardDeviceService : IKeyboardDeviceService
 
         if (!SetupApiNative.SetupDiCallClassInstaller(SetupApiNative.Dif.PropertyChange, deviceInfoSet, ref deviceInfoData))
         {
-            throw new Win32Exception(Marshal.GetLastWin32Error());
+            var error = Marshal.GetLastWin32Error();
+            // 0xE0000231: ERROR_NOT_DISABLEABLE - The device cannot be disabled.
+            if (error == unchecked((int)0xE0000231))
+            {
+                // Fallback to CM_* APIs
+                var result = state == SetupApiNative.Dics.Disable
+                    ? CfgMgr32Native.CM_Disable_DevNode(deviceInfoData.DevInst, 0)
+                    : CfgMgr32Native.CM_Enable_DevNode(deviceInfoData.DevInst, 0);
+
+                if (result != CfgMgr32Native.CrSuccess)
+                {
+                    throw new Win32Exception(error);
+                }
+                return;
+            }
+
+            throw new Win32Exception(error);
         }
     }
 
