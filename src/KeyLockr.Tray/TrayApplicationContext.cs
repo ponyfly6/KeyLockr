@@ -183,7 +183,7 @@ public sealed class TrayApplicationContext : ApplicationContext
             {
                 case KeyboardStatus.Locked:
                     _notifyIcon.Icon = _lockedIcon;
-                    _notifyIcon.Text = "KeyLockr: 内置键盘已锁定";
+                    _notifyIcon.Text = "KeyLockr: 内置键盘已锁定 (软屏蔽已启用)";
                     _toggleMenuItem.Text = "解锁内置键盘";
                     _lockMenuItem.Enabled = false;
                     _unlockMenuItem.Enabled = true;
@@ -228,7 +228,8 @@ public sealed class TrayApplicationContext : ApplicationContext
             await _keyboardManager.LockAsync(false).ConfigureAwait(false);
             _isLocked = true;
             ApplyStatusToUi(KeyboardStatus.Locked);
-            ShowBalloon("已禁用内置键盘", ToolTipIcon.Info);
+            var blocked = GetBlockedCountSafe();
+            ShowBalloon(blocked > 0 ? $"已启用软屏蔽，已拦截 {blocked} 次按键" : "已禁用内置键盘（软屏蔽启用）", ToolTipIcon.Info);
         }
         catch (ExternalKeyboardNotFoundException ex)
         {
@@ -258,7 +259,8 @@ public sealed class TrayApplicationContext : ApplicationContext
             await _keyboardManager.LockAsync(true).ConfigureAwait(false);
             _isLocked = true;
             ApplyStatusToUi(KeyboardStatus.Locked);
-            ShowBalloon("已强制禁用内置键盘", ToolTipIcon.Warning);
+            var blocked = GetBlockedCountSafe();
+            ShowBalloon(blocked > 0 ? $"强制锁定：软屏蔽生效，已拦截 {blocked} 次按键" : "强制锁定：已启用软屏蔽", ToolTipIcon.Warning);
         }
         catch (Exception ex)
         {
@@ -299,7 +301,29 @@ public sealed class TrayApplicationContext : ApplicationContext
             _ => "无法确定当前状态，可能未识别到内置键盘。"
         };
 
+        var blocked = GetBlockedCountSafe();
+        if (status == KeyboardStatus.Locked)
+        {
+            message += blocked > 0 ? $"（软屏蔽已拦截 {blocked} 次按键）" : "（软屏蔽已启用）";
+        }
         ShowBalloon(message, status == KeyboardStatus.Unknown ? ToolTipIcon.Warning : ToolTipIcon.Info);
+    }
+
+    private int GetBlockedCountSafe()
+    {
+        try
+        {
+            // 通过反射读取 SoftKeyboardBlocker 的 BlockedKeyCount（避免改变公开接口过多）
+            var field = typeof(KeyboardManager).GetField("_softBlocker", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field?.GetValue(_keyboardManager) is KeyLockr.Core.Services.SoftKeyboardBlocker blocker)
+            {
+                return blocker.BlockedKeyCount;
+            }
+        }
+        catch
+        {
+        }
+        return 0;
     }
 
     private void ShowError(string message)

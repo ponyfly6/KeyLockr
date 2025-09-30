@@ -12,6 +12,18 @@
           "bin/placeholder/KeyLockr.Core.dll": {}
         }
       }
+    },
+    "net8.0-windows10.0.19041/win-x64": {
+      "KeyLockr.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/KeyLockr.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/KeyLockr.Core.dll": {}
+        }
+      }
     }
   },
   "libraries": {
@@ -100,6 +112,11 @@
           }
         },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.414/PortableRuntimeIdentifierGraph.json"
+      }
+    },
+    "runtimes": {
+      "win-x64": {
+        "#import": []
       }
     }
   }

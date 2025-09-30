@@ -5,6 +5,7 @@ namespace KeyLockr.Core.Interop;
 internal static class CfgMgr32Native
 {
     public const int CrSuccess = 0;
+    public const int CM_DISABLE_HARDWARE = 0x00000001;
 
     [Flags]
     public enum CmProblem : uint

@@ -2,15 +2,17 @@ using System.ComponentModel;
 using KeyLockr.Core.Configuration;
 using KeyLockr.Core.Devices;
 using KeyLockr.Core.Exceptions;
+using KeyLockr.Core.Services;
 
 namespace KeyLockr.Core;
 
-public sealed class KeyboardManager
+public sealed class KeyboardManager : IDisposable
 {
     private const int ErrorNotDisableable = unchecked((int)0xE0000231);
 
     private readonly IKeyboardDeviceService _deviceService;
     private readonly KeyLockrConfigurationStore _configurationStore;
+    private readonly SoftKeyboardBlocker _softBlocker;
 
     public KeyboardManager()
         : this(new KeyboardDeviceService(), new KeyLockrConfigurationStore())
@@ -21,6 +23,7 @@ public sealed class KeyboardManager
     {
         _deviceService = deviceService;
         _configurationStore = configurationStore;
+        _softBlocker = new SoftKeyboardBlocker();
     }
 
     public async Task LockAsync(bool skipExternalKeyboardCheck = false, CancellationToken cancellationToken = default)
@@ -50,6 +53,7 @@ public sealed class KeyboardManager
         }
 
         var failureDetails = new List<string>();
+        var hardwareDisableSucceeded = false;
         Win32Exception? lastWin32Error = null;
 
         foreach (var candidate in candidates.Where(device => device.IsEnabled))
@@ -58,21 +62,52 @@ public sealed class KeyboardManager
             {
                 await _deviceService.DisableAsync(candidate.InstanceId, cancellationToken).ConfigureAwait(false);
                 await PersistInternalKeyboardIdAsync(configuration, candidate.InstanceId, cancellationToken).ConfigureAwait(false);
+                hardwareDisableSucceeded = true;
                 return;
             }
             catch (Win32Exception ex) when (ex.NativeErrorCode is 5)
             {
-                throw new AdministrativePrivilegesRequiredException("禁用键盘需要管理员权限，请以管理员身份运行应用。");
+                // 无管理员权限时，记录失败并回退到软件阻止，而不是直接抛出
+                failureDetails.Add($"设备 {candidate.Description} ({candidate.InstanceId}) 需要管理员权限才能禁用，已回退到软件阻止。");
+                lastWin32Error = ex;
+            }
+            catch (DeviceOperationException ex) when (ex.InnerException is Win32Exception { NativeErrorCode: ErrorNotDisableable })
+            {
+                failureDetails.Add($"设备 {candidate.Description} ({candidate.InstanceId}) 不支持硬件禁用。");
+                lastWin32Error = ex.InnerException as Win32Exception;
             }
             catch (Win32Exception ex) when (ex.NativeErrorCode == ErrorNotDisableable)
             {
-                failureDetails.Add($"设备 {candidate.Description} ({candidate.InstanceId}) 不支持禁用。");
+                failureDetails.Add($"设备 {candidate.Description} ({candidate.InstanceId}) 不支持硬件禁用。");
                 lastWin32Error = ex;
             }
             catch (Win32Exception ex)
             {
                 failureDetails.Add($"设备 {candidate.Description} ({candidate.InstanceId}) 禁用失败：{ex.Message}");
                 lastWin32Error = ex;
+            }
+            catch (Exception ex)
+            {
+                failureDetails.Add($"设备 {candidate.Description} ({candidate.InstanceId}) 禁用失败：{ex.Message}");
+            }
+        }
+
+        // If hardware disable failed for all devices, try software blocking
+        if (!hardwareDisableSucceeded && failureDetails.Count > 0)
+        {
+            try
+            {
+                _softBlocker.StartBlocking();
+                // Success with software blocking - persist the first candidate's ID for status tracking
+                if (candidates.Count > 0)
+                {
+                    await PersistInternalKeyboardIdAsync(configuration, candidates[0].InstanceId, cancellationToken).ConfigureAwait(false);
+                }
+                return;
+            }
+            catch (Exception ex)
+            {
+                failureDetails.Add($"软件阻止也失败：{ex.Message}");
             }
         }
 
@@ -98,6 +133,13 @@ public sealed class KeyboardManager
         }
 
         var lockedDevices = candidates.Where(device => !device.IsEnabled).ToList();
+        
+        // Always stop software blocking first
+        if (_softBlocker.IsBlocking)
+        {
+            _softBlocker.StopBlocking();
+        }
+        
         if (lockedDevices.Count == 0)
         {
             return;
@@ -145,6 +187,12 @@ public sealed class KeyboardManager
             return KeyboardStatus.Unknown;
         }
 
+        // Check if software blocking is active
+        if (_softBlocker.IsBlocking)
+        {
+            return KeyboardStatus.Locked;
+        }
+        
         return internalKeyboard.IsEnabled ? KeyboardStatus.Unlocked : KeyboardStatus.Locked;
     }
 
@@ -277,6 +325,11 @@ public sealed class KeyboardManager
         {
             // 保存失败不影响锁定主流程，记录失败但不抛出。
         }
+    }
+
+    public void Dispose()
+    {
+        _softBlocker?.Dispose();
     }
 }
 

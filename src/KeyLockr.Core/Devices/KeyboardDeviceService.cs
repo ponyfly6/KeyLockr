@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 using KeyLockr.Core.Interop;
+using KeyLockr.Core.Exceptions;
 
 namespace KeyLockr.Core.Devices;
 
@@ -142,16 +143,29 @@ public sealed class KeyboardDeviceService : IKeyboardDeviceService
             // 0xE0000231: ERROR_NOT_DISABLEABLE - The device cannot be disabled.
             if (error == unchecked((int)0xE0000231))
             {
-                // Fallback to CM_* APIs
+                // Try CM_* APIs first
                 var result = state == SetupApiNative.Dics.Disable
                     ? CfgMgr32Native.CM_Disable_DevNode(deviceInfoData.DevInst, 0)
                     : CfgMgr32Native.CM_Enable_DevNode(deviceInfoData.DevInst, 0);
 
-                if (result != CfgMgr32Native.CrSuccess)
+                if (result == CfgMgr32Native.CrSuccess)
                 {
-                    throw new Win32Exception(error);
+                    return; // Success with CM_ APIs
                 }
-                return;
+
+                // If CM_ APIs also fail, try forced disable approach
+                if (state == SetupApiNative.Dics.Disable)
+                {
+                    // Try setting device to disabled state directly
+                    var disableResult = CfgMgr32Native.CM_Disable_DevNode(deviceInfoData.DevInst, CfgMgr32Native.CM_DISABLE_HARDWARE);
+                    if (disableResult == CfgMgr32Native.CrSuccess)
+                    {
+                        return;
+                    }
+                }
+
+                // All methods failed, throw descriptive exception
+                throw new DeviceOperationException($"设备不支持禁用。此设备可能受到系统保护，无法通过标准方法禁用。", new Win32Exception(error));
             }
 
             throw new Win32Exception(error);

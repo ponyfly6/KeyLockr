@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KeyLockr.Tray")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07a486ce5ef23fc6221a9c59250a89e18fdf6895")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c6b5eec99a8be3cc4a69cdef337bc66e1bef354e")]
 [assembly: System.Reflection.AssemblyProductAttribute("KeyLockr.Tray")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KeyLockr.Tray")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
